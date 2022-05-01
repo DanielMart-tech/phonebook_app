@@ -75,21 +75,18 @@ app.put("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   let { name, number } = request.body;
-
-  if (!name || !number) {
-    return response.status(400).json({
-      error: "name and/or number missing",
-    });
-  }
 
   const person = new Person({
     name,
     number,
   });
 
-  person.save().then((savedPerson) => response.json(savedPerson));
+  person
+    .save()
+    .then((savedPerson) => response.json(savedPerson.toJSON()))
+    .catch((error) => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
@@ -103,11 +100,13 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError")
     return response.status(400).send({ error: "malformatted id" });
+  else if (error.name === "ValidationError")
+    return response.status(400).json({ error: error.message });
 
   next(error);
 };
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
