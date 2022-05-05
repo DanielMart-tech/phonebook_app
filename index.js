@@ -17,7 +17,7 @@ app.use(
 app.use(cors());
 app.use(express.static("build"));
 
-let persons = [
+/* let persons = [
   {
     name: "Arto Hellas",
     number: "040-123456",
@@ -38,7 +38,7 @@ let persons = [
     number: "39-23-6423122",
     id: 4,
   },
-];
+]; */
 
 app.get("/info", (request, response) => {
   Person.find().then((persons) => {
@@ -67,7 +67,7 @@ app.get("/api/persons/:id", (request, response, next) => {
 
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then((result) => response.status(204).end())
+    .then(() => response.status(204).end())
     .catch((error) => next(error));
 });
 
